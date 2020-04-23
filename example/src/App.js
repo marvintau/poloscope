@@ -21,20 +21,70 @@ const DefaultHeader = forwardRef((props, ref) => {
   </div>
 })
 
+const Item = forwardRef(({index, data:{height, text}, bound}, ref) => {
+
+  // **style of outermost level**
+  // 
+  // position:absolute is manadatory, so that to anchor over
+  // the closest parent DOM. and always merge the bound into
+  // the inline style of actual DOM, for proper position and
+  // height.
+  const outerStyle = {
+    position:'absolute',
+    width:'100%',
+    asdasdasd:'123',
+    ...bound
+  }
+
+  const innerStyle = {
+    height,
+    display:'flex',
+    alignItems: 'center',
+    // borderBottom:'1px solid black',
+    boxSizing:'border-box',
+    whiteSpace: 'pre',
+    fontFamily: '"TheSansMono Office", monospaced',
+    backgroundColor: index % 2 ? 'rgb(128, 128, 128, 0.2)' : 'white'
+  }
+
+  // **placing of ref**
+  // Ref should be placed to the layer that actually affects
+  // the height.
+  return <div style={outerStyle}><div style={innerStyle} ref={ref}>{text}</div></div>
+})
+
 const App = () => {
   
+  let marked = false;
+
   const listData = [...Array(500000)].map((_, i) => {
-    return `${i.toString().padStart(7, ' ')} Randomly generated string: ${Math.random().toString(36).slice(7, 12)}`
+
+    const main = `${i.toString().padStart(7, ' ')} Randomly generated string: ${Math.random().toString(36).slice(7, 12)}`;
+
+    let prob = '';
+    if (marked){
+      prob = '|| and it works well.';
+      marked = false;
+    }
+    if (Math.random() > 0.95 && !marked){
+      marked = true;
+      prob = '|| You may noticed that the height of lines are not uniformed';
+    }
+
+    return {
+      height: Math.random() * 40 + 40,
+      text: `${main} ${prob}`
+    }
   });
 
   return <div>
     <h1>Rendering millions of records with no delay.</h1>
     <div className='wrapper'>
-      <List {...{listData, outerHeight: 400, overscan: 20}} >
+      <List {...{listData, Item, outerHeight: 400, overscan: 20}} >
         <DefaultHeader />
       </List>
     </div>
-    <content>感受一下</content>
+    <content>来来来，你们感受一下。</content>
   </div>
 }
 

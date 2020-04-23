@@ -25,39 +25,6 @@ const findNearest = (min, max, test) =>{
   return (min > 0) ? min - 1 : 0;
 };
 
-const DefaultItem = forwardRef(({index, data, bound}, ref) => {
-
-  // **style of outermost level**
-  // 
-  // position:absolute is manadatory, so that to anchor over
-  // the closest parent DOM. and always merge the bound into
-  // the inline style of actual DOM, for proper position and
-  // height.
-  const outerStyle = {
-    position:'absolute',
-    width:'100%',
-    asdasdasd:'123',
-    ...bound
-  }
-
-  const innerStyle = {
-    display:'flex',
-    alignItems: 'center',
-    height: 50,
-    // borderBottom:'1px solid black',
-    boxSizing:'border-box',
-    whiteSpace: 'pre',
-    fontFamily: '"TheSansMono Office", monospaced',
-    backgroundColor: index % 2 ? 'rgb(128, 128, 128, 0.2)' : 'white'
-  }
-
-  // **placing of ref**
-  // Ref should be placed to the layer that actually affects
-  // the height.
-  return <div style={outerStyle}><div style={innerStyle} ref={ref}>{data}</div></div>
-})
-
-
 // ### Note: List是如何进行渲染的
 // 
 // #### 首次（首屏）渲染
@@ -70,7 +37,7 @@ const DefaultItem = forwardRef(({index, data, bound}, ref) => {
 // 在滚动的过程中我们不断渲染新的条目，然而经过reconciliation，不会有频繁的
 // 条目增删操作。但是每个条目的偏移和高度都会计算并保存下来。
 // 
-export default ({listData=[], Item=DefaultItem, outerHeight, overscan=10, children}) => {
+export default ({listData=[], Item, outerHeight, overscan=10, children}) => {
 
   const itemCount = listData.length;
 
@@ -351,7 +318,8 @@ export default ({listData=[], Item=DefaultItem, outerHeight, overscan=10, childr
     </div>
     <Indicator {...{
       barHeight: INDICATOR_BAR_HEIGHT,
-      offset: getIndicatorPosition()
+      offset: getIndicatorPosition(),
+      isScrolling,
     }}  />
   </div>
 }
