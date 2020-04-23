@@ -39,11 +39,13 @@ const Item = forwardRef(({index, data:{height, text}, bound}, ref) => {
   const innerStyle = {
     height,
     display:'flex',
+    paddingLeft:'20px',
     alignItems: 'center',
     // borderBottom:'1px solid black',
     boxSizing:'border-box',
     whiteSpace: 'pre',
-    fontFamily: '"TheSansMono Office", monospaced',
+    fontFamily: '"TheSansMono Office", "Droid Sans Mono", Menlo, Consolas, monospace',
+    letterSpacing: '-1px',
     backgroundColor: index % 2 ? 'rgb(128, 128, 128, 0.2)' : 'white'
   }
 
@@ -59,21 +61,20 @@ const App = () => {
 
   const listData = [...Array(500000)].map((_, i) => {
 
-    const main = `${i.toString().padStart(7, ' ')} Randomly generated string: ${Math.random().toString(36).slice(7, 12)}`;
+    let text = `${i.toString().padEnd(7, ' ')} Randomly generated string:\n        ${Math.random().toString(36).slice(7, 12)}`;
 
-    let prob = '';
     if (marked){
-      prob = '|| and it works well.';
+      text = 'and it works well.';
       marked = false;
     }
     if (Math.random() > 0.95 && !marked){
       marked = true;
-      prob = '|| You may noticed that the height of lines are not uniformed';
+      text = 'You might have noticed that\nthe height of\nlines are not quite uniformed';
     }
 
     return {
       height: Math.random() * 40 + 40,
-      text: `${main} ${prob}`
+      text
     }
   });
 
