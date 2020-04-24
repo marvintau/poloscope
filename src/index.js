@@ -37,7 +37,7 @@ const findNearest = (min, max, test) =>{
 // 在滚动的过程中我们不断渲染新的条目，然而经过reconciliation，不会有频繁的
 // 条目增删操作。但是每个条目的偏移和高度都会计算并保存下来。
 // 
-export default ({listData=[], Item, outerHeight, overscan=10, children}) => {
+export default ({listData=[], Item, height:outerHeight, overscan=10, children}) => {
 
   const itemCount = listData.length;
 
@@ -45,7 +45,7 @@ export default ({listData=[], Item, outerHeight, overscan=10, children}) => {
     isScrolling,
     scrollOffsetDelta,
     scrollOffset,
-    setScrollOffset,
+    // setScrollOffset,
     onScroll,
   } = useScroll();
 
@@ -283,21 +283,10 @@ export default ({listData=[], Item, outerHeight, overscan=10, children}) => {
   };
 
   const outerRef = useRef(null);
-  // useEffect(() => {
-  //   const elem = outerRef.current;
-  //   if (scrollOffsetDelta < 0){
-  //     const {itemsHeightDelta} = data;
-  //     console.log('delta updated', data.itemsHeightDelta);
-  //     if (typeof elem.scrollBy === 'function'){
-  //       console.log('scrollBy')
-  //       elem.scrollBy(0, itemsHeightDelta);
-  //     } else {
-  //       elem.scrollTop = scrollOffset + itemsHeightDelta;
-  //     }
-
-  //     data.itemsHeightDelta -= itemsHeightDelta;
-  //   }
-  // }, [scrollOffsetDelta])
+  useEffect(() => {
+    const elem = outerRef.current;
+    console.log('outerref', elem);
+  }, [outerRef])
 
   const outerStyle = {
     height:outerHeight,
