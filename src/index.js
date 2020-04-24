@@ -39,6 +39,8 @@ const findNearest = (min, max, test) =>{
 // 
 export default ({listData=[], Item, height:outerHeight, overscan=10, children}) => {
 
+  console.log('linked test');
+
   const itemCount = listData.length;
 
   const {
