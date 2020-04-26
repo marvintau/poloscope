@@ -5,11 +5,12 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "poloscope": "file:..",
     "prop-types": "^15.6.2",
     "react": "file:../node_modules/react",
     "react-dom": "^16.4.1",
     "react-scripts": "^1.1.4",
-    "poloscope": "file:.."
+    "react-virtualized-auto-sizer": "^1.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

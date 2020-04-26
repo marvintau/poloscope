@@ -5,8 +5,6 @@ export default ({barHeight, offset, isScrolling}) => {
 
   const duration = 100;
 
-  console.log('indicator offset', offset)
-
   const style = {
     position:'absolute',
     backgroundColor:'rgb(128, 128, 128, 0.7)',

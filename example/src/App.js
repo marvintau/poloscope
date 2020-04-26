@@ -1,27 +1,17 @@
-import React, {forwardRef, useState, useEffect} from 'react';
+import React, {forwardRef} from 'react';
+import Autosizer from 'react-virtualized-auto-sizer';
 import List from 'poloscope';
 
 import './index.css';
 
 const DefaultHeader = forwardRef((props, ref) => {
 
-  const headerStyle = {
-    backgroundColor: 'rgb(255, 255, 255, 0.8)',
-    position: 'sticky',
-    top: '0px',
-    width:'100%',
-    height: 50,
-    zIndex: '2'
-  };
-
-  return <div style={headerStyle}>
-    <div style={{height:'100%', display:'flex', alignItems:'center', paddingLeft: '20px', fontWeight: 300}} ref={ref}>
-      Put your customized header here.
-    </div>
+  return <div style={{height:'100%', display:'flex', alignItems:'center', paddingLeft: '20px', fontWeight: 300}} ref={ref}>
+    Put your customized header here.
   </div>
 })
 
-const Item = forwardRef(({index, data:{height, text}, bound}, ref) => {
+const Row = forwardRef(({index, data:{height, text}, style}, ref) => {
 
   // **style of outermost level**
   // 
@@ -30,10 +20,8 @@ const Item = forwardRef(({index, data:{height, text}, bound}, ref) => {
   // the inline style of actual DOM, for proper position and
   // height.
   const outerStyle = {
-    position:'absolute',
     width:'100%',
-    asdasdasd:'123',
-    ...bound
+    ...style
   }
 
   const innerStyle = {
@@ -59,7 +47,7 @@ const App = () => {
   
   let marked = false;
 
-  const listData = [...Array(500000)].map((_, i) => {
+  const itemData = [...Array(5000)].map((_, i) => {
 
     let text = `${i.toString().padEnd(7, ' ')} Randomly generated string:\n        ${Math.random().toString(36).slice(7, 12)}`;
 
@@ -78,14 +66,18 @@ const App = () => {
     }
   });
 
-  return <div>
-    <h1>Rendering millions of records with no delay.</h1>
-    <div className='wrapper'>
-      <List {...{listData, Item, outerHeight: 400, overscan: 20}} >
-        <DefaultHeader />
-      </List>
+  return <div style={{height: '100vh', display:'flex', flexDirection:'column', overflow:'auto'}}>
+    <div className="h1" >Rendering millions of records with no delay.</div>
+    <div style={{height: '100%'}}>
+      <Autosizer disableWidth={true}>
+        {({height}) => {
+          return <List {...{itemData, Row, height, overscan: 1}} >
+            <DefaultHeader />
+          </List>
+        }}
+      </Autosizer>
     </div>
-    <content>来来来，你们感受一下。</content>
+    <div className="content">来来来，你们感受一下。</div>
   </div>
 }
 

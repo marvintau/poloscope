@@ -1,3 +1,7 @@
+.outer {
+  overflow-y: scroll;
+  will-change: transform;
+}
 .outer::-webkit-scrollbar{
   width: 0px;
   background: transparent;  /* Optional: just make scrollbar invisible */

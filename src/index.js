@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, useState, forwardRef} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import Indicator from './indicator';
 import Measurer from './measurer';
 import useScroll from './useScroll';
@@ -37,11 +37,9 @@ const findNearest = (min, max, test) =>{
 // 在滚动的过程中我们不断渲染新的条目，然而经过reconciliation，不会有频繁的
 // 条目增删操作。但是每个条目的偏移和高度都会计算并保存下来。
 // 
-export default ({listData=[], Item, height:outerHeight, overscan=10, children}) => {
+export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) => {
 
-  console.log('linked test');
-
-  const itemCount = listData.length;
+  const itemCount = itemData.length;
 
   const {
     isScrolling,
@@ -68,13 +66,9 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
     measuredBottom: -1, 
     itemsTop:0,
     itemsHeight: 0,
-    itemsBottomPadding: 0,
   });
   const data = dataRef.current;
-  const {
-    currentBottom,
-  } = data;
-
+  const {currentBottom} = data;
   const [_, forceUpdate] = useState();
 
   useEffect(() => {
@@ -87,9 +81,8 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
       itemsHeight,
       itemsTop,
       measuredBottom,
-      itemsBottomPadding
     } = data;
-    return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * INITIAL_ITEM_HEIGHT + itemsBottomPadding
+    return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * INITIAL_ITEM_HEIGHT
   };
 
   const getIndicatorPosition = () => {
@@ -123,16 +116,17 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
    * @param {number} index 
    * @param {number} height 
    */
-  const setItemHeight = (currHeight, {index, firstMeasure}) => {
+  const setItemHeight = (currHeight, {index}) => {
     // 1. **handling measureBottom & itemsHeight**
     if (index <= data.measuredBottom){
-      // console.log('reset occured', index, data.measuredBottom);
       //    *  index within the measuredBottom, which means we are updating the height of
     //       a rendered item. Apply the difference of the curr & prev to overalHeight.
       const prevHeight = data.bounds[index].height;
       data.itemsHeight += currHeight - prevHeight;
 
+
     } else {
+      // console.log('measure NEW', index, currHeight);
     //    *  index below the measuredBottom, which indicates that the element is just
     //       rendered and not measured yet. We update the newly conquered frontier,
     //       and the itemsHeight here.
@@ -180,9 +174,9 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
    * 
    * @param {Integer} dest 要更新到的index
    */
-  const updatePositionsTo = (dest) => {
+  const updatePositionsTo = (dest, from) => {
     const {currentBottom, itemsTop, bounds} = data;
-    // console.log(currentBottom, dest, from)
+    // console.log('position', currentBottom, dest, from)
 
     if (currentBottom < 0) {
       bounds[0] = {
@@ -264,18 +258,16 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
 
   const renderItems = () => {
 
-    if (listData.length > 0){
+    if (itemData.length > 0){
       const {overStart: start} = getStartIndex();
-      const {overStop:  stop} = getStopIndex(start, listData.length)
-
-      // console.log(`${start} ${stop} | mes:${data.measuredBottom} curr:${data.currentBottom}`)
+      const {overStop:  stop} = getStopIndex(start, itemData.length)
 
       const items = [];
       for (let index = start; index <= stop; index++) {
         const bound = getItemBound(index);
         const {height} = bound;
         items.push(<Measurer {...{key:index, height, callback:setItemHeight, index}}>
-          <Item {...{index, data: listData[index], bound}} />
+          <Row {...{index, data: itemData[index], style:{...bound, position:'absolute'}}} />
         </Measurer>)
       }
       return items;
@@ -284,28 +276,16 @@ export default ({listData=[], Item, height:outerHeight, overscan=10, children}) 
     }
   };
 
-  const outerRef = useRef(null);
-  useEffect(() => {
-    const elem = outerRef.current;
-    console.log('outerref', elem);
-  }, [outerRef])
-
-  const outerStyle = {
-    height:outerHeight,
-    // border:'2px solid gray',
-    // boxSizing:'border-box',
-    overflowY: 'scroll',
-    willChange: 'transform',
-  }
-
   const innerStyle = {
     position:'relative',
     height: getOverallHeight()
   }
-  return <div style={{position: 'relative'}}>
-    <div className={styles.outer} {...{style: outerStyle, onScroll, ref:outerRef}}>
-      {children}
-      <div {...{style: innerStyle}} >{renderItems()} </div>
+  return <div style={{position:'relative', height:outerHeight, overflow:'hidden'}}>
+    <div className={styles.outer} {...{style: {overflowY:'scroll', height:outerHeight}, onScroll}}>
+      <div style={{position:'sticky', top:'0', height:'auto', zIndex: 10}}>
+        {children}
+      </div>
+      <div style={innerStyle} >{renderItems()} </div>
     </div>
     <Indicator {...{
       barHeight: INDICATOR_BAR_HEIGHT,

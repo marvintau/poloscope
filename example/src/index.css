@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+  /* overflow: hidden; */
 }
 
 .wrapper{
@@ -9,7 +10,7 @@ body {
   border: 1px solid black;
 }
 
-h1 {
+h1, .h1 {
   margin: 10px;
   width: 400px;
   font-size: 2.5rem;
@@ -18,7 +19,7 @@ h1 {
   letter-spacing: -0.19rem;
 }
 
-content{
+content, .content{
   margin: 10px;
   font-size: 90%;
 }
