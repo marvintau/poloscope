@@ -33,9 +33,20 @@ const findNearest = (min, max, test) =>{
 // **已经渲染了的**条目的DOM。所以首次渲染只能先给定一个大概的条目的高度，
 // 在进行渲染之后，让条目在一个useEffect中更新其高度，并通知回List。
 // 
-// #### 后续渲染
+// #### 滚动时重新渲染
 // 在滚动的过程中我们不断渲染新的条目，然而经过reconciliation，不会有频繁的
 // 条目增删操作。但是每个条目的偏移和高度都会计算并保存下来。
+// 
+// #### spontaneous重新渲染
+// 如果某些组件会通过其他方式，譬如textarea resizing，或者带有添加或删除
+// 项目元素的交互功能，那么也需要重新渲染。
+// 
+// 
+// 特别重要：对于List控制重新渲染的途径只有一个，就是下方的updateOverallHeight。
+// updateOverallHeight是最外层List的唯一参数，因此如果不更新overallHeight状态
+// 就无法rerender。同时，由于所有List元素的高度及变化都会反映在OverallHeight
+// 上，因此完全由overallHeight控制能保证所有元素在各种情况下发生高度变化时都能
+// 重新渲染。（正确性及唯一性）
 // 
 export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) => {
 
@@ -76,7 +87,8 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     forceUpdate(currentBottom);
   }, [currentBottom])
 
-  const getOverallHeight = () => {
+
+  const calcOverallHeight = () => {
     const {
       itemsHeight,
       itemsTop,
@@ -85,9 +97,14 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * INITIAL_ITEM_HEIGHT
   };
 
+  const [overallHeight, setOverallHeight] = useState(calcOverallHeight());
+  
+  const updateOverallHeight = () => {
+    setOverallHeight(calcOverallHeight());
+  }
+
   const getIndicatorPosition = () => {
     const margin = 3;
-    const overallHeight = getOverallHeight();
     return margin + scrollOffset / (overallHeight - outerHeight) * (outerHeight - INDICATOR_BAR_HEIGHT - INITIAL_ITEM_HEIGHT - margin)
   }
 
@@ -116,7 +133,7 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
    * @param {number} index 
    * @param {number} height 
    */
-  const setItemHeight = (currHeight, {index}) => {
+  const setItemHeight = (currHeight, {index, measured}) => {
     // 1. **handling measureBottom & itemsHeight**
     if (index <= data.measuredBottom){
       //    *  index within the measuredBottom, which means we are updating the height of
@@ -142,6 +159,11 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     //    them is referred later.
     if (index < data.currentBottom) {
       data.currentBottom = index;
+    }
+
+    if (measured) {
+      // console.log('force update');
+      updateOverallHeight();
     }
   }
 
@@ -175,8 +197,8 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
    * @param {Integer} dest 要更新到的index
    */
   const updatePositionsTo = (dest, from) => {
+    // console.log('position', dest, from)
     const {currentBottom, itemsTop, bounds} = data;
-    // console.log('position', currentBottom, dest, from)
 
     if (currentBottom < 0) {
       bounds[0] = {
@@ -278,7 +300,7 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
 
   const innerStyle = {
     position:'relative',
-    height: getOverallHeight()
+    height: overallHeight
   }
   return <div style={{position:'relative', height:outerHeight, overflow:'hidden'}}>
     <div className={styles.outer} {...{style: {overflowY:'scroll', height:outerHeight}, onScroll}}>

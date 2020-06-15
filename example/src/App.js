@@ -1,4 +1,4 @@
-import React, {forwardRef} from 'react';
+import React, {forwardRef, useState} from 'react';
 import Autosizer from 'react-virtualized-auto-sizer';
 import List from 'poloscope';
 
@@ -11,7 +11,21 @@ const DefaultHeader = forwardRef((props, ref) => {
   </div>
 })
 
-const Row = forwardRef(({index, data:{height, text}, style}, ref) => {
+const AdditiveElem = ({lines}) => {
+  const [list, setList] = useState(lines);
+  
+  const addToList = () => {
+    setList([...list, list.length]);
+    lines.push(list.length);
+  }
+
+  return <div style={{display:'flex', flexDirection:'column'}}>
+    {list.map((e, i) => <div key={i}>{e} elem</div>)}
+    <button onClick={addToList}> + </button>
+  </div>
+}
+
+const Row = forwardRef(({index, data:{lines}, style}, ref) => {
 
   // **style of outermost level**
   // 
@@ -25,9 +39,9 @@ const Row = forwardRef(({index, data:{height, text}, style}, ref) => {
   }
 
   const innerStyle = {
-    height,
+    // height,
     display:'flex',
-    paddingLeft:'20px',
+    // margin:'20px',
     alignItems: 'center',
     // borderBottom:'1px solid black',
     boxSizing:'border-box',
@@ -40,29 +54,15 @@ const Row = forwardRef(({index, data:{height, text}, style}, ref) => {
   // **placing of ref**
   // Ref should be placed to the layer that actually affects
   // the height.
-  return <div style={outerStyle}><div style={innerStyle} ref={ref}>{text}</div></div>
+  return <div style={outerStyle}><div style={innerStyle} ref={ref}><AdditiveElem lines={lines}/></div></div>
 })
 
 const App = () => {
   
-  let marked = false;
-
-  const itemData = [...Array(5000)].map((_, i) => {
-
-    let text = `${i.toString().padEnd(7, ' ')} Randomly generated string:\n        ${Math.random().toString(36).slice(7, 12)}`;
-
-    if (marked){
-      text = 'and it works well.';
-      marked = false;
-    }
-    if (Math.random() > 0.95 && !marked){
-      marked = true;
-      text = 'You might have noticed that\nthe height of\nlines are not quite uniformed';
-    }
+  const itemData = [...Array(50)].map((_, i) => {
 
     return {
-      height: Math.random() * 40 + 40,
-      text
+      lines:[0]
     }
   });
 
@@ -71,7 +71,7 @@ const App = () => {
     <div style={{height: '100%'}}>
       <Autosizer disableWidth={true}>
         {({height}) => {
-          return <List {...{itemData, Row, height, overscan: 1}} >
+          return <List {...{itemData, Row, height, overscan: 10}} >
             <DefaultHeader />
           </List>
         }}

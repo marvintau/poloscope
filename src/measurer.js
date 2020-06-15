@@ -1,4 +1,4 @@
-import {cloneElement, useRef, useEffect} from 'react';
+import {cloneElement, useRef, useEffect, useState} from 'react';
 
 import useResizeObserver from './useResizeObserver';
 
@@ -6,16 +6,22 @@ const Measurer = ({children, height:origHeight, callback, ...props}) => {
 
   const ref = useRef(null)
 
+  const [measured, markMesured] = useState(false);
+
   const {height: resizedHeight} = useResizeObserver(ref.current);
 
   useEffect(() => {
     if (resizedHeight === undefined){
       const {height: initialHeight} = ref.current.getBoundingClientRect();
-      callback(initialHeight, {...props, firstMeasure: true});
+      callback(initialHeight, {...props, measured});
     } else {
-      callback(resizedHeight, props)  
+      // console.log('resize observed', props);
+      if (!measured) {
+        markMesured(true);
+      }
+      callback(resizedHeight, {...props, measured})  
     }
-  }, [origHeight, callback])
+  }, [origHeight, resizedHeight, callback])
 
   return cloneElement(children, {ref})
 }
