@@ -9,27 +9,27 @@ const now = hasNativePerformanceNow
 
 const DEBOUNCE_INTERVAL = 1000;
 
+var timeoutID;
+
 export default () => {
 
   const [isScrolling, setScrolling] = useState(false);
   const [scrollOffset, setOffset]= useState(0);
   const [scrollOffsetDelta, setOffsetDelta]= useState(0);
 
-  const timeoutID = useRef(null);
-
   function debounce(callback) {
     const start = now();
   
     function tick() {
       if (now() - start >= DEBOUNCE_INTERVAL) {
-        cancelAnimationFrame(timeoutID.current);
+        cancelAnimationFrame(timeoutID);
         callback();
       } else {
-        timeoutID.current = requestAnimationFrame(tick);
+        timeoutID = requestAnimationFrame(tick);
       }
     }
   
-    timeoutID.current = requestAnimationFrame(tick);
+    timeoutID = requestAnimationFrame(tick);
   }
   
   const onScroll = (event) => {
