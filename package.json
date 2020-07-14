@@ -1,6 +1,6 @@
 {
   "name": "@marvintau/poloscope",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "render large list with virtualizing technique",
   "author": "marvintau",
   "license": "MIT",
@@ -21,9 +21,9 @@
     "predeploy": "cd example && npm install && npm run build",
     "deploy": "gh-pages -d example/build",
     "release": "standard-version",
-    "publish-package": "git push --follow-tags origin master && npm publish --access public"  
+    "publish-package": "git push --follow-tags origin master && npm publish --access public"
   },
-  "jest" : {
+  "jest": {
     "coverageReporters": [
       "json-summary",
       "text",
