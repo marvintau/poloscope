@@ -23,9 +23,16 @@
     "release": "standard-version",
     "publish-package": "git push --follow-tags origin master && npm publish --access public"  
   },
+  "jest" : {
+    "coverageReporters": [
+      "json-summary",
+      "text",
+      "lcov"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "jest --coverage && node_modules/.bin/jest-badges-readme && git add 'README.md'",
+      "pre-commit": "npm test -- --coverage && node_modules/.bin/jest-badges-readme && git add 'README.md'",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
