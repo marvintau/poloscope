@@ -10,19 +10,22 @@ const Measurer = ({children, height:origHeight, callback, ...props}) => {
 
   const {height: resizedHeight} = useResizeObserver(ref.current);
 
-  useEffect(() => {
+  const handleResize = () => {
+    (!measured) && markMesured(true);
+    let newHeight;
     if (resizedHeight === undefined){
-      const {height: initialHeight} = ref.current.getBoundingClientRect();
-      callback(initialHeight, {...props, measured});
+      const res = ref.current.getBoundingClientRect();
+      newHeight = res.height;
     } else {
-      // console.log('resize observed', props);
-      if (!measured) {
-        markMesured(true);
-      }
-      callback(resizedHeight, {...props, measured})  
+      newHeight = resizedHeight;
     }
-  }, [origHeight, resizedHeight, callback])
 
+    callback(newHeight, {...props, measured})
+  }
+
+  useEffect(() => {
+    handleResize();
+  }, [origHeight, resizedHeight])
   return cloneElement(children, {ref})
 }
 

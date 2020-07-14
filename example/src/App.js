@@ -39,7 +39,6 @@ const Row = forwardRef(({index, data:{lines}, style}, ref) => {
   }
 
   const innerStyle = {
-    // height,
     display:'flex',
     // margin:'20px',
     alignItems: 'center',
@@ -59,8 +58,7 @@ const Row = forwardRef(({index, data:{lines}, style}, ref) => {
 
 const App = () => {
   
-  const itemData = [...Array(50)].map((_, i) => {
-
+  const itemData = [...Array(5000000)].map((_, i) => {
     return {
       lines:[0]
     }

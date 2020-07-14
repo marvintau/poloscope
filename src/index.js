@@ -1,4 +1,4 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import Indicator from './indicator';
 import Measurer from './measurer';
 import useScroll from './useScroll';
@@ -78,22 +78,13 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     itemsTop:0,
     itemsHeight: 0,
   });
-  const data = dataRef.current;
-  const {currentBottom} = data;
-  const [_, forceUpdate] = useState();
-
-  useEffect(() => {
-    updatePositionsTo(currentBottom, 'effect');
-    forceUpdate(currentBottom);
-  }, [currentBottom])
-
 
   const calcOverallHeight = () => {
     const {
       itemsHeight,
       itemsTop,
       measuredBottom,
-    } = data;
+    } = dataRef.current;
     return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * INITIAL_ITEM_HEIGHT
   };
 
@@ -135,11 +126,11 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
    */
   const setItemHeight = (currHeight, {index, measured}) => {
     // 1. **handling measureBottom & itemsHeight**
-    if (index <= data.measuredBottom){
+    if (index <= dataRef.current.measuredBottom){
       //    *  index within the measuredBottom, which means we are updating the height of
     //       a rendered item. Apply the difference of the curr & prev to overalHeight.
-      const prevHeight = data.bounds[index].height;
-      data.itemsHeight += currHeight - prevHeight;
+      const prevHeight = dataRef.current.bounds[index].height;
+      dataRef.current.itemsHeight += currHeight - prevHeight;
 
 
     } else {
@@ -147,22 +138,21 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     //    *  index below the measuredBottom, which indicates that the element is just
     //       rendered and not measured yet. We update the newly conquered frontier,
     //       and the itemsHeight here.
-      data.measuredBottom = index;
-      data.itemsHeight += currHeight;
+      dataRef.current.measuredBottom = index;
+      dataRef.current.itemsHeight += currHeight;
     }
 
-    data.bounds[index].height = currHeight;
+    dataRef.current.bounds[index].height = currHeight;
 
     // 2. **invalidate all element positions below _index_. **
     // 
     //    New positions will be calculated when any of
     //    them is referred later.
-    if (index < data.currentBottom) {
-      data.currentBottom = index;
+    if (index < dataRef.current.currentBottom) {
+      dataRef.current.currentBottom = index;
     }
 
     if (measured) {
-      // console.log('force update');
       updateOverallHeight();
     }
   }
@@ -197,11 +187,11 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
    * @param {Integer} dest 要更新到的index
    */
   const updatePositionsTo = (dest, from) => {
-    // console.log('position', dest, from)
-    const {currentBottom, itemsTop, bounds} = data;
+    // console.log('updatePositionsTo', dest, from)
+    const {currentBottom, itemsTop, bounds} = dataRef.current;
 
     if (currentBottom < 0) {
-      bounds[0] = {
+      dataRef.current.bounds[0] = {
         top: itemsTop,
         height: INITIAL_ITEM_HEIGHT,
         bottom: INITIAL_ITEM_HEIGHT + itemsTop};
@@ -214,25 +204,25 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
 
       // console.log(`top: ${top} | height: ${height} | bottom: ${bottom}`);
 
-      bounds[i] = { top, height, bottom };
+      dataRef.current.bounds[i] = { top, height, bottom };
     }
   }
 
   const getItemBound = (index) => {
-    const {currentBottom, bounds} = data;
+
     // case that currentBottom is previously set by setItemHeight,
     // which means the positions of items below are invalidated, and
     // need to be calculated again.
-    if (index > currentBottom) {
-      updatePositionsTo(index, 'get item');
-      data.currentBottom = index;
+    if (index > dataRef.current.currentBottom) {
+      updatePositionsTo(index, 'GET-ITEM-BOUND');
+      dataRef.current.currentBottom = index;
     }
 
-    return bounds[index];
+    return dataRef.current.bounds[index];
   };
   
   const getStartIndex = () => {
-    const {measuredBottom, itemsHeight} = data;
+    const {measuredBottom, itemsHeight} = dataRef.current;
     
     const test = (index) => {
       const {top:curr} = getItemBound(index);
@@ -292,22 +282,23 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
           <Row {...{index, data: itemData[index], style:{...bound, position:'absolute'}}} />
         </Measurer>)
       }
+      // console.log(items.length, 'render items', start, stop);
       return items;
     } else {
       return [];
     }
   };
-
+  
   const innerStyle = {
     position:'relative',
     height: overallHeight
   }
   return <div style={{position:'relative', height:outerHeight, overflow:'hidden'}}>
-    <div className={styles.outer} {...{style: {overflowY:'scroll', height:outerHeight}, onScroll}}>
+    <div id="scrollView" className={styles.outer} {...{style: {overflowY:'scroll', height:outerHeight}, onScroll}}>
       <div style={{position:'sticky', top:'0', height:'auto', zIndex: 10}}>
         {children}
       </div>
-      <div style={innerStyle} >{renderItems()} </div>
+      <div className='inner-marker' style={innerStyle} >{renderItems()} </div>
     </div>
     <Indicator {...{
       barHeight: INDICATOR_BAR_HEIGHT,

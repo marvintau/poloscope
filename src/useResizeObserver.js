@@ -10,6 +10,7 @@ export default (node) => {
       setRect(contentRect)
     });
 
+    
     node && obs.current.observe(node);
   }, [node]);
 
