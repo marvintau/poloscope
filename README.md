@@ -1,6 +1,6 @@
 | Statements | Branches | Functions | Lines |
 | -----------|----------|-----------|-------|
-| ![Statements](https://img.shields.io/badge/Coverage-77.37%25-red.svg "Make me better!") | ![Branches](https://img.shields.io/badge/Coverage-50.85%25-red.svg "Make me better!") | ![Functions](https://img.shields.io/badge/Coverage-75%25-red.svg "Make me better!") | ![Lines](https://img.shields.io/badge/Coverage-78.36%25-red.svg "Make me better!") |
+| ![Statements](https://img.shields.io/badge/Coverage-77.21%25-red.svg "Make me better!") | ![Branches](https://img.shields.io/badge/Coverage-51.67%25-red.svg "Make me better!") | ![Functions](https://img.shields.io/badge/Coverage-75%25-red.svg "Make me better!") | ![Lines](https://img.shields.io/badge/Coverage-78.2%25-red.svg "Make me better!") |
 
 # poloscope
 

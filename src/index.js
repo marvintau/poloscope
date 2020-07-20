@@ -5,8 +5,6 @@ import useScroll from './useScroll';
 
 import styles from './styles.css';
 
-const INITIAL_ITEM_HEIGHT = 10;
-
 const INDICATOR_BAR_HEIGHT = 60;
 
 const findNearest = (min, max, test) =>{
@@ -48,7 +46,7 @@ const findNearest = (min, max, test) =>{
 // 上，因此完全由overallHeight控制能保证所有元素在各种情况下发生高度变化时都能
 // 重新渲染。（正确性及唯一性）
 // 
-export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) => {
+export default ({itemData=[], Row, height:outerHeight, overscan=10, initialItemHeight=10, children}) => {
 
   const itemCount = itemData.length;
 
@@ -85,7 +83,7 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
       itemsTop,
       measuredBottom,
     } = dataRef.current;
-    return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * INITIAL_ITEM_HEIGHT
+    return itemsTop + itemsHeight + (itemCount - measuredBottom + 1) * initialItemHeight
   };
 
   const [overallHeight, setOverallHeight] = useState(calcOverallHeight());
@@ -96,7 +94,7 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
 
   const getIndicatorPosition = () => {
     const margin = 3;
-    return margin + scrollOffset / (overallHeight - outerHeight) * (outerHeight - INDICATOR_BAR_HEIGHT - INITIAL_ITEM_HEIGHT - margin)
+    return margin + scrollOffset / (overallHeight - outerHeight) * (outerHeight - INDICATOR_BAR_HEIGHT - initialItemHeight - margin)
   }
 
   // # setItemHeight
@@ -193,13 +191,13 @@ export default ({itemData=[], Row, height:outerHeight, overscan=10, children}) =
     if (currentBottom < 0) {
       dataRef.current.bounds[0] = {
         top: itemsTop,
-        height: INITIAL_ITEM_HEIGHT,
-        bottom: INITIAL_ITEM_HEIGHT + itemsTop};
+        height: initialItemHeight,
+        bottom: initialItemHeight + itemsTop};
     };
 
     for (let i = Math.max(0, currentBottom); i <= dest; i++) {
       const top = i === 0 ? itemsTop : bounds[i-1].bottom;
-      const height = bounds[i] && bounds[i].height || INITIAL_ITEM_HEIGHT
+      const height = bounds[i] && bounds[i].height || initialItemHeight
       const bottom =  top + height;
 
       // console.log(`top: ${top} | height: ${height} | bottom: ${bottom}`);
