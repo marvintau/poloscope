@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.10](https://github.com/marvintau/poloscope/compare/v0.0.9...v0.0.10) (2020-07-20)
+
+
+### Bug Fixes
+
+* various enhancement ([d550243](https://github.com/marvintau/poloscope/commit/d5502433fa585fdca6870adb5b66a0b49205f361))
+
 ### 0.0.9 (2020-07-14)
 
 
