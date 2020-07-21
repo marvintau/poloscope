@@ -1,6 +1,6 @@
 {
   "name": "@marvintau/poloscope",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "render large list with virtualizing technique",
   "author": "marvintau",
   "license": "MIT",
